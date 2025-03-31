@@ -7,10 +7,18 @@ interface NutritionInfoProps {
 
 export default function NutritionInfo({ foodEntry }: NutritionInfoProps) {
   // Calculate percentage for macronutrients
-  const totalGrams = foodEntry.protein + foodEntry.carbs + foodEntry.fats;
-  const proteinPercentage = (foodEntry.protein / totalGrams) * 100;
-  const carbsPercentage = (foodEntry.carbs / totalGrams) * 100;
-  const fatsPercentage = (foodEntry.fats / totalGrams) * 100;
+  const protein = foodEntry.protein || 0;
+  const carbs = foodEntry.carbs || 0;
+  const fats = foodEntry.fats || 0;
+  const calories = foodEntry.calories || 0;
+  
+  // Ensure nutrients object exists
+  const nutrients = foodEntry.nutrients || {};
+  
+  const totalGrams = protein + carbs + fats;
+  const proteinPercentage = totalGrams > 0 ? (protein / totalGrams) * 100 : 0;
+  const carbsPercentage = totalGrams > 0 ? (carbs / totalGrams) * 100 : 0;
+  const fatsPercentage = totalGrams > 0 ? (fats / totalGrams) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -53,32 +61,32 @@ export default function NutritionInfo({ foodEntry }: NutritionInfoProps) {
         <div className="grid grid-cols-2 gap-3">
           <div className="border rounded-md p-3">
             <div className="text-xs text-muted-foreground mb-1">Calories</div>
-            <div className="font-semibold">{foodEntry.calories}</div>
+            <div className="font-semibold">{calories}</div>
           </div>
           
           <div className="border rounded-md p-3">
             <div className="text-xs text-muted-foreground mb-1">Protein</div>
-            <div className="font-semibold">{foodEntry.protein}g</div>
+            <div className="font-semibold">{protein}g</div>
           </div>
           
           <div className="border rounded-md p-3">
             <div className="text-xs text-muted-foreground mb-1">Carbs</div>
-            <div className="font-semibold">{foodEntry.carbs}g</div>
+            <div className="font-semibold">{carbs}g</div>
           </div>
           
           <div className="border rounded-md p-3">
             <div className="text-xs text-muted-foreground mb-1">Fats</div>
-            <div className="font-semibold">{foodEntry.fats}g</div>
+            <div className="font-semibold">{fats}g</div>
           </div>
           
           <div className="border rounded-md p-3">
             <div className="text-xs text-muted-foreground mb-1">Fiber</div>
-            <div className="font-semibold">{foodEntry.nutrients?.fiber || 0}g</div>
+            <div className="font-semibold">{nutrients.fiber || 0}g</div>
           </div>
           
           <div className="border rounded-md p-3">
             <div className="text-xs text-muted-foreground mb-1">Sugar</div>
-            <div className="font-semibold">{foodEntry.nutrients?.sugar || 0}g</div>
+            <div className="font-semibold">{nutrients.sugar || 0}g</div>
           </div>
         </div>
       </div>
@@ -92,27 +100,27 @@ export default function NutritionInfo({ foodEntry }: NutritionInfoProps) {
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Calories</span>
-            <span className="font-medium">{Math.round((foodEntry.calories / 2000) * 100)}%</span>
+            <span className="font-medium">{Math.round((calories / 2000) * 100)}%</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Protein</span>
-            <span className="font-medium">{Math.round((foodEntry.protein / 50) * 100)}%</span>
+            <span className="font-medium">{Math.round((protein / 50) * 100)}%</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Carbs</span>
-            <span className="font-medium">{Math.round((foodEntry.carbs / 300) * 100)}%</span>
+            <span className="font-medium">{Math.round((carbs / 300) * 100)}%</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Fats</span>
-            <span className="font-medium">{Math.round((foodEntry.fats / 65) * 100)}%</span>
+            <span className="font-medium">{Math.round((fats / 65) * 100)}%</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Fiber</span>
-            <span className="font-medium">{Math.round(((foodEntry.nutrients?.fiber || 0) / 28) * 100)}%</span>
+            <span className="font-medium">{Math.round(((nutrients.fiber || 0) / 28) * 100)}%</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Sugar</span>
-            <span className="font-medium">{Math.round(((foodEntry.nutrients?.sugar || 0) / 50) * 100)}%</span>
+            <span className="font-medium">{Math.round(((nutrients.sugar || 0) / 50) * 100)}%</span>
           </div>
         </div>
       </div>

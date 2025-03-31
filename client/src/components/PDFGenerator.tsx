@@ -12,6 +12,13 @@ interface PDFGeneratorProps {
 export default function PDFGenerator({ foodEntry }: PDFGeneratorProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   
+  // Handle null values and provide defaults
+  const calories = foodEntry.calories || 0;
+  const protein = foodEntry.protein || 0;
+  const carbs = foodEntry.carbs || 0;
+  const fats = foodEntry.fats || 0;
+  const nutrients = foodEntry.nutrients || {};
+  
   const generatePDF = async () => {
     setIsGenerating(true);
     try {
@@ -75,16 +82,16 @@ export default function PDFGenerator({ foodEntry }: PDFGeneratorProps) {
       
       // Add calorie information
       pdf.setFontSize(12);
-      pdf.text(`Calories: ${foodEntry.calories}`, 20, yPosition);
+      pdf.text(`Calories: ${calories}`, 20, yPosition);
       yPosition += 8;
       
       // Add macronutrients
       const macros = [
-        { name: "Protein", value: `${foodEntry.protein}g` },
-        { name: "Carbohydrates", value: `${foodEntry.carbs}g` },
-        { name: "Fats", value: `${foodEntry.fats}g` },
-        { name: "Fiber", value: `${foodEntry.nutrients?.fiber || 0}g` },
-        { name: "Sugar", value: `${foodEntry.nutrients?.sugar || 0}g` }
+        { name: "Protein", value: `${protein}g` },
+        { name: "Carbohydrates", value: `${carbs}g` },
+        { name: "Fats", value: `${fats}g` },
+        { name: "Fiber", value: `${nutrients.fiber || 0}g` },
+        { name: "Sugar", value: `${nutrients.sugar || 0}g` }
       ];
       
       macros.forEach(macro => {
@@ -95,7 +102,7 @@ export default function PDFGenerator({ foodEntry }: PDFGeneratorProps) {
       yPosition += 5;
       
       // Add vitamins section if available
-      if (foodEntry.nutrients?.vitamins && Object.keys(foodEntry.nutrients.vitamins).length > 0) {
+      if (nutrients.vitamins && Object.keys(nutrients.vitamins || {}).length > 0) {
         pdf.setFontSize(14);
         pdf.text("Vitamins", 20, yPosition);
         yPosition += 8;
@@ -107,7 +114,7 @@ export default function PDFGenerator({ foodEntry }: PDFGeneratorProps) {
         pdf.setFontSize(10);
         
         // Create two columns for vitamins
-        const vitaminEntries = Object.entries(foodEntry.nutrients.vitamins);
+        const vitaminEntries = Object.entries(nutrients.vitamins || {});
         const midPoint = Math.ceil(vitaminEntries.length / 2);
         
         const leftColumn = vitaminEntries.slice(0, midPoint);
@@ -140,7 +147,7 @@ export default function PDFGenerator({ foodEntry }: PDFGeneratorProps) {
       }
       
       // Add minerals section if available
-      if (foodEntry.nutrients?.minerals && Object.keys(foodEntry.nutrients.minerals).length > 0) {
+      if (nutrients.minerals && Object.keys(nutrients.minerals || {}).length > 0) {
         pdf.setFontSize(14);
         pdf.text("Minerals", 20, yPosition);
         yPosition += 8;
@@ -152,7 +159,7 @@ export default function PDFGenerator({ foodEntry }: PDFGeneratorProps) {
         pdf.setFontSize(10);
         
         // Create two columns for minerals
-        const mineralEntries = Object.entries(foodEntry.nutrients.minerals);
+        const mineralEntries = Object.entries(nutrients.minerals || {});
         const midPoint = Math.ceil(mineralEntries.length / 2);
         
         const leftColumn = mineralEntries.slice(0, midPoint);
@@ -196,11 +203,11 @@ export default function PDFGenerator({ foodEntry }: PDFGeneratorProps) {
       pdf.setFontSize(10);
       
       const dailyValues = [
-        { name: "Calories", value: `${Math.round((foodEntry.calories / 2000) * 100)}%` },
-        { name: "Protein", value: `${Math.round((foodEntry.protein / 50) * 100)}%` },
-        { name: "Carbohydrates", value: `${Math.round((foodEntry.carbs / 300) * 100)}%` },
-        { name: "Fats", value: `${Math.round((foodEntry.fats / 65) * 100)}%` },
-        { name: "Fiber", value: `${Math.round(((foodEntry.nutrients?.fiber || 0) / 28) * 100)}%` }
+        { name: "Calories", value: `${Math.round((calories / 2000) * 100)}%` },
+        { name: "Protein", value: `${Math.round((protein / 50) * 100)}%` },
+        { name: "Carbohydrates", value: `${Math.round((carbs / 300) * 100)}%` },
+        { name: "Fats", value: `${Math.round((fats / 65) * 100)}%` },
+        { name: "Fiber", value: `${Math.round(((nutrients.fiber || 0) / 28) * 100)}%` }
       ];
       
       // Create two columns for daily values
