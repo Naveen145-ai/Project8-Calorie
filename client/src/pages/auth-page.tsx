@@ -67,7 +67,7 @@ export default function AuthPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate("/");
+      navigate("/dashboard");
     }
   }, [user, navigate]);
 
@@ -93,8 +93,8 @@ export default function AuthPage() {
       onSuccess: () => {
         // Force a reload of the user data
         queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-        // Redirect to dashboard or home
-        navigate("/");
+        // Redirect to dashboard
+        navigate("/dashboard");
       },
     });
   }
