@@ -163,6 +163,11 @@ export default function AuthPage() {
                       type="submit" 
                       className="w-full" 
                       disabled={loginMutation.isPending || isLoading}
+                      onClick={() => {
+                        if (!loginForm.formState.isSubmitting) {
+                          navigate("/dashboard");
+                        }
+                      }}
                     >
                       {loginMutation.isPending ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -257,6 +262,11 @@ export default function AuthPage() {
                       type="submit" 
                       className="w-full" 
                       disabled={registerMutation.isPending || isLoading}
+                      onClick={() => {
+                        if (!registerForm.formState.isSubmitting) {
+                          setActiveTab("login");
+                        }
+                      }}
                     >
                       {registerMutation.isPending ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
