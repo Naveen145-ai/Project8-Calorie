@@ -72,20 +72,56 @@ export default function Header() {
                 </nav>
 
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      {user.username.charAt(0).toUpperCase()}
+                  <div className="relative group">
+                    <button className="flex items-center gap-2 p-2 rounded-full hover:bg-muted transition-colors">
+                      <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold border-2 border-primary/30">
+                        {user.username.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-sm font-medium">{user.username}</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-200 group-hover:rotate-180">
+                        <path d="m6 9 6 6 6-6"/>
+                      </svg>
+                    </button>
+                    
+                    {/* Profile dropdown */}
+                    <div className="absolute right-0 mt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                      <div className="py-2 rounded-md shadow-md bg-card border border-border">
+                        <div className="px-4 py-2 border-b border-border">
+                          <p className="text-sm font-medium">{user.fullName || user.username}</p>
+                          <p className="text-xs text-muted-foreground">{user.email}</p>
+                        </div>
+                        
+                        <div className="px-2 py-2">
+                          <Link href="/dashboard">
+                            <a className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-primary/10 transition-colors">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+                                <rect width="3" height="9" x="7" y="7"></rect>
+                                <rect width="3" height="5" x="14" y="7"></rect>
+                              </svg>
+                              Dashboard
+                            </a>
+                          </Link>
+                          <Link href="/history">
+                            <a className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-primary/10 transition-colors">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                              </svg>
+                              History
+                            </a>
+                          </Link>
+                          <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-destructive/10 text-destructive transition-colors"
+                          >
+                            <LogOut className="h-4 w-4" />
+                            Sign out
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <span className="text-sm font-medium">{user.username}</span>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={handleLogout}
-                    aria-label="Logout"
-                  >
-                    <LogOut className="h-5 w-5" />
-                  </Button>
                 </div>
               </div>
             ) : (

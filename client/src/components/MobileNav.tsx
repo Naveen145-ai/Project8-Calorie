@@ -66,9 +66,15 @@ export default function MobileNav() {
           <div className="flex flex-col gap-2">
             {user ? (
               <>
-                <div className="mb-4 p-4 bg-primary/10 rounded-lg">
-                  <p className="text-sm font-medium">Welcome back</p>
-                  <p className="text-base font-bold">{user.username}</p>
+                <div className="mb-4 p-4 bg-primary/10 rounded-lg flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold border-2 border-primary/30 flex-shrink-0">
+                    {user.username.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Signed in as</p>
+                    <p className="text-base font-bold">{user.fullName || user.username}</p>
+                    <p className="text-xs text-muted-foreground truncate max-w-[200px]">{user.email}</p>
+                  </div>
                 </div>
                 {menuItems.map((item) => (
                   <SheetClose key={item.href} asChild>
