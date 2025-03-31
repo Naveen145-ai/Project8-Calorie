@@ -12,19 +12,13 @@ import { ProtectedRoute } from "./lib/protected-route";
 function Router() {
   return (
     <Switch>
-      <Route path="/">
-        <LandingPage />
-      </Route>
-      <Route path="/auth">
-        <AuthPage />
-      </Route>
+      <Route path="/" component={LandingPage} />
+      <Route path="/auth" component={AuthPage} />
       <ProtectedRoute path="/dashboard" component={Dashboard} />
       <ProtectedRoute path="/food-analysis" component={FoodAnalysis} />
       <ProtectedRoute path="/meal-planning" component={MealPlanning} />
       <ProtectedRoute path="/workout-plans" component={WorkoutPlans} />
-      <Route>
-        <NotFound />
-      </Route>
+      <Route component={NotFound} />
     </Switch>
   );
 }

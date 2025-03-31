@@ -6,6 +6,7 @@ import { z } from "zod";
 import { insertUserSchema } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -40,6 +41,7 @@ export default function AuthPage() {
   const [activeTab, setActiveTab] = useState("login");
   const [, navigate] = useLocation();
   const { user, loginMutation, registerMutation, isLoading } = useAuth();
+  const { toast } = useToast();
 
   // Create register form
   const registerForm = useForm<RegisterFormValues>({
@@ -65,7 +67,7 @@ export default function AuthPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate("/dashboard");
+      navigate("/");
     }
   }, [user, navigate]);
 
@@ -74,12 +76,13 @@ export default function AuthPage() {
     const { confirmPassword, ...userData } = data;
     registerMutation.mutate(userData, {
       onSuccess: () => {
-        // Force a reload of the user data
-        queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-        // Redirect to dashboard
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 500);
+        // After successful registration, switch to the login tab
+        setActiveTab("login");
+        // Show success toast
+        toast({
+          title: "Registration successful",
+          description: "Please log in with your new account",
+        });
       },
     });
   }
@@ -90,10 +93,8 @@ export default function AuthPage() {
       onSuccess: () => {
         // Force a reload of the user data
         queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-        // Redirect to dashboard
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 500);
+        // Redirect to dashboard or home
+        navigate("/");
       },
     });
   }
