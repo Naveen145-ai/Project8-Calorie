@@ -17,7 +17,12 @@ export default function PDFGenerator({ foodEntry }: PDFGeneratorProps) {
   const protein = foodEntry.protein || 0;
   const carbs = foodEntry.carbs || 0;
   const fats = foodEntry.fats || 0;
-  const nutrients = foodEntry.nutrients || {};
+  const nutrients = (foodEntry.nutrients as any) || {
+    vitamins: {},
+    minerals: {},
+    fiber: 0,
+    sugar: 0
+  };
   
   const generatePDF = async () => {
     setIsGenerating(true);

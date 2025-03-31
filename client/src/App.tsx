@@ -10,6 +10,7 @@ import WorkoutPlans from "@/pages/workout-plans";
 import AlternativesPage from "@/pages/alternatives";
 import HistoryPage from "@/pages/history";
 import ScanFood from "@/pages/scan-food";
+import ChatBot from "@/components/ChatBot";
 import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
@@ -38,6 +39,7 @@ function App() {
     <>
       <Router />
       <Toaster />
+      <ChatBot />
     </>
   );
 }

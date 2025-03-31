@@ -132,7 +132,8 @@ export default function HistoryPage() {
   };
 
   // Format date for display
-  const formatDate = (timestamp: string | Date) => {
+  const formatDate = (timestamp: string | Date | null) => {
+    if (!timestamp) return "N/A";
     const date = typeof timestamp === "string" ? new Date(timestamp) : timestamp;
     return format(date, "MMM d, yyyy h:mm a");
   };
@@ -394,10 +395,10 @@ export default function HistoryPage() {
                       <div>
                         <h4 className="font-medium mb-2">Vitamins</h4>
                         <div className="grid grid-cols-2 gap-2">
-                          {Object.entries(selectedFood.nutrients.vitamins || {}).map(([vitamin, amount]) => (
+                          {Object.entries((selectedFood.nutrients as any)?.vitamins || {}).map(([vitamin, amount]: [string, any]) => (
                             <div key={vitamin} className="flex justify-between text-sm">
                               <span>{vitamin}:</span>
-                              <span className="font-medium">{amount}mg</span>
+                              <span className="font-medium">{String(amount)}mg</span>
                             </div>
                           ))}
                         </div>
@@ -406,10 +407,10 @@ export default function HistoryPage() {
                       <div>
                         <h4 className="font-medium mb-2">Minerals</h4>
                         <div className="grid grid-cols-2 gap-2">
-                          {Object.entries(selectedFood.nutrients.minerals || {}).map(([mineral, amount]) => (
+                          {Object.entries((selectedFood.nutrients as any)?.minerals || {}).map(([mineral, amount]: [string, any]) => (
                             <div key={mineral} className="flex justify-between text-sm">
                               <span>{mineral}:</span>
-                              <span className="font-medium">{amount}mg</span>
+                              <span className="font-medium">{String(amount)}mg</span>
                             </div>
                           ))}
                         </div>
@@ -418,11 +419,11 @@ export default function HistoryPage() {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="bg-muted p-3 rounded-lg">
                           <p className="text-xs font-medium text-muted-foreground">Fiber</p>
-                          <p className="text-lg font-bold">{selectedFood.nutrients.fiber}g</p>
+                          <p className="text-lg font-bold">{(selectedFood.nutrients as any)?.fiber || 0}g</p>
                         </div>
                         <div className="bg-muted p-3 rounded-lg">
                           <p className="text-xs font-medium text-muted-foreground">Sugar</p>
-                          <p className="text-lg font-bold">{selectedFood.nutrients.sugar}g</p>
+                          <p className="text-lg font-bold">{(selectedFood.nutrients as any)?.sugar || 0}g</p>
                         </div>
                       </div>
                     </div>

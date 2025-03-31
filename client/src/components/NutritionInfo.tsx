@@ -12,8 +12,13 @@ export default function NutritionInfo({ foodEntry }: NutritionInfoProps) {
   const fats = foodEntry.fats || 0;
   const calories = foodEntry.calories || 0;
   
-  // Ensure nutrients object exists
-  const nutrients = foodEntry.nutrients || {};
+  // Ensure nutrients object exists with proper typing
+  const nutrients = (foodEntry.nutrients as any) || {
+    vitamins: {},
+    minerals: {},
+    fiber: 0,
+    sugar: 0
+  };
   
   const totalGrams = protein + carbs + fats;
   const proteinPercentage = totalGrams > 0 ? (protein / totalGrams) * 100 : 0;
