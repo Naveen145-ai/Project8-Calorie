@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -139,7 +139,6 @@ const allergyOptions = [
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("profile");
-  const { toast } = useToast();
   const { user, logoutMutation } = useAuth();
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
