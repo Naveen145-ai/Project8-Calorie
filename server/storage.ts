@@ -5,6 +5,40 @@ import createMemoryStore from "memorystore";
 
 const MemoryStore = createMemoryStore(session);
 
+// Define the recommendation data interface
+interface RecommendationData {
+  nutrientTrends: Array<{
+    nutrient: string;
+    average: number;
+    recommended: number;
+    unit: string;
+  }>;
+  dietaryPatterns: string[];
+  mealRecommendations: Array<{
+    type: string;
+    suggestions: Array<{
+      name: string;
+      reasoning: string;
+      nutrients: {
+        calories: number;
+        protein: number;
+        carbs: number;
+        fats: number;
+      };
+      imageDescription?: string;
+    }>;
+  }>;
+  healthInsights: string[];
+}
+
+// Define the recommendation model
+interface UserRecommendation {
+  id: number;
+  userId: number;
+  data: RecommendationData;
+  createdAt: Date;
+}
+
 export interface IStorage {
   // User related
   getUser(id: number): Promise<User | undefined>;
@@ -38,6 +72,11 @@ export interface IStorage {
   getWaitlistEntryByEmail(email: string): Promise<WaitlistEntry | undefined>;
   createWaitlistEntry(entry: InsertWaitlistEntry): Promise<WaitlistEntry>;
 
+  // Recommendations
+  getRecommendations(userId: number): Promise<UserRecommendation | undefined>;
+  saveRecommendations(userId: number, data: RecommendationData): Promise<UserRecommendation>;
+  deleteRecommendations(userId: number): Promise<boolean>;
+
   // Session store
   sessionStore: session.SessionStore;
 }
@@ -48,6 +87,7 @@ export class MemStorage implements IStorage {
   private mealPlans: Map<number, MealPlan>;
   private workoutPlans: Map<number, WorkoutPlan>;
   private waitlistEntries: Map<number, WaitlistEntry>;
+  private recommendations: Map<number, UserRecommendation>;
   currentId: { [key: string]: number };
   sessionStore: session.SessionStore;
 
@@ -57,12 +97,14 @@ export class MemStorage implements IStorage {
     this.mealPlans = new Map();
     this.workoutPlans = new Map();
     this.waitlistEntries = new Map();
+    this.recommendations = new Map();
     this.currentId = {
       users: 1,
       foodEntries: 1,
       mealPlans: 1,
       workoutPlans: 1,
-      waitlistEntries: 1
+      waitlistEntries: 1,
+      recommendations: 1
     };
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000, // 24 hours
@@ -207,6 +249,44 @@ export class MemStorage implements IStorage {
     const waitlistEntry: WaitlistEntry = { ...entry, id, createdAt: now };
     this.waitlistEntries.set(id, waitlistEntry);
     return waitlistEntry;
+  }
+
+  // Recommendation methods
+  async getRecommendations(userId: number): Promise<UserRecommendation | undefined> {
+    const recommendations = Array.from(this.recommendations.values()).find(
+      (rec) => rec.userId === userId
+    );
+    return recommendations;
+  }
+
+  async saveRecommendations(userId: number, data: RecommendationData): Promise<UserRecommendation> {
+    // First check if recommendations already exist for this user
+    const existingRec = await this.getRecommendations(userId);
+    
+    if (existingRec) {
+      // Update existing
+      const updatedRec = { ...existingRec, data, createdAt: new Date() };
+      this.recommendations.set(existingRec.id, updatedRec);
+      return updatedRec;
+    } else {
+      // Create new
+      const id = this.currentId.recommendations++;
+      const now = new Date();
+      const recommendation: UserRecommendation = {
+        id,
+        userId,
+        data,
+        createdAt: now
+      };
+      this.recommendations.set(id, recommendation);
+      return recommendation;
+    }
+  }
+
+  async deleteRecommendations(userId: number): Promise<boolean> {
+    const rec = await this.getRecommendations(userId);
+    if (!rec) return false;
+    return this.recommendations.delete(rec.id);
   }
 }
 

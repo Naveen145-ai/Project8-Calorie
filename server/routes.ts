@@ -10,6 +10,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
 import chatRouter from "./routes/chat";
+import recommendationsRouter from "./routes/recommendations";
 
 // Set up multer for file uploads
 const upload = multer({ 
@@ -21,8 +22,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication routes
   setupAuth(app);
   
-  // Use chat router
+  // Use routers
   app.use(chatRouter);
+  app.use(recommendationsRouter);
 
   // Auth middleware
   const isAuthenticated = (req: Request, res: Response, next: Function) => {

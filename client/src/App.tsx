@@ -10,6 +10,7 @@ import WorkoutPlans from "@/pages/workout-plans";
 import AlternativesPage from "@/pages/alternatives";
 import HistoryPage from "@/pages/history";
 import ScanFood from "@/pages/scan-food";
+import RecommendationsPage from "@/pages/recommendations";
 import ChatBot from "@/components/ChatBot";
 import { ProtectedRoute } from "./lib/protected-route";
 
@@ -27,6 +28,7 @@ function Router() {
       <ProtectedRoute path="/alternatives" component={AlternativesPage} />
       <ProtectedRoute path="/workout-plans" component={WorkoutPlans} />
       <ProtectedRoute path="/history" component={HistoryPage} />
+      <ProtectedRoute path="/recommendations" component={RecommendationsPage} />
       
       {/* Fallback route */}
       <Route component={NotFound} />

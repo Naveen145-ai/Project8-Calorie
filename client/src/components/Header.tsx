@@ -64,6 +64,11 @@ export default function Header() {
                       History
                     </a>
                   </Link>
+                  <Link href="/recommendations">
+                    <a className={`transition-colors hover:text-primary ${location === "/recommendations" ? "text-primary" : ""}`}>
+                      For You
+                    </a>
+                  </Link>
                 </nav>
 
                 <div className="flex items-center gap-4">
