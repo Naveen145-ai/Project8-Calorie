@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { insertUserSchema } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
+import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -73,7 +74,12 @@ export default function AuthPage() {
     const { confirmPassword, ...userData } = data;
     registerMutation.mutate(userData, {
       onSuccess: () => {
-        navigate("/dashboard");
+        // Force a reload of the user data
+        queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+        // Redirect to dashboard
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 500);
       },
     });
   }
@@ -82,7 +88,12 @@ export default function AuthPage() {
   function onLoginSubmit(data: LoginFormValues) {
     loginMutation.mutate(data, {
       onSuccess: () => {
-        navigate("/dashboard");
+        // Force a reload of the user data
+        queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+        // Redirect to dashboard
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 500);
       },
     });
   }
