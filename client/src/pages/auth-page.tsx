@@ -101,8 +101,14 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
+      {/* Mobile Header - Only visible on mobile */}
+      <div className="md:hidden w-full bg-primary text-white p-4 text-center">
+        <h2 className="text-xl font-bold">NutriScan<span className="text-white/80">AI</span></h2>
+        <p className="text-sm text-white/80">Your AI-powered nutrition companion</p>
+      </div>
+      
       {/* Left side: Form */}
-      <div className="md:w-1/2 flex flex-col justify-center items-center p-8 bg-white">
+      <div className="md:w-1/2 flex flex-col justify-center items-center p-4 md:p-8 bg-white order-2 md:order-1">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
             <Link href="/" className="inline-flex items-center space-x-2">
@@ -165,7 +171,7 @@ export default function AuthPage() {
                       disabled={loginMutation.isPending || isLoading}
                       onClick={() => {
                         if (!loginForm.formState.isSubmitting) {
-                          navigate("/dashboard");
+                          navigate("/");
                         }
                       }}
                     >
@@ -223,7 +229,15 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Full Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter your full name" {...field} />
+                            <Input 
+                              placeholder="Enter your full name" 
+                              value={field.value || ''} 
+                              onChange={field.onChange}
+                              onBlur={field.onBlur}
+                              disabled={field.disabled}
+                              name={field.name}
+                              ref={field.ref}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -294,8 +308,8 @@ export default function AuthPage() {
         </div>
       </div>
 
-      {/* Right side: Hero/Promo */}
-      <div className="md:w-1/2 bg-gradient-to-br from-primary to-primary-dark p-8 flex flex-col justify-center items-center text-white">
+      {/* Right side: Hero/Promo - Hidden on mobile */}
+      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-primary to-primary-dark p-8 flex-col justify-center items-center text-white order-1 md:order-2">
         <div className="max-w-md text-center">
           <h2 className="text-3xl font-bold mb-4">Transform Your Health Journey</h2>
           <p className="mb-6">
