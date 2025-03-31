@@ -37,12 +37,43 @@ export default function ChatBot() {
   }, [chatHistory]);
 
   // Send chat message to API
+  // Default responses when API fails
+  const defaultResponses = {
+    "calories": "To estimate calories in food, consider the major macronutrients: proteins (4 calories/gram), carbohydrates (4 calories/gram), and fats (9 calories/gram). For an average meal, this could range from 300-800 calories depending on portion size and ingredients.",
+    "meal plan": "A balanced meal plan should include proteins (lean meats, beans, tofu), complex carbohydrates (whole grains, vegetables), healthy fats (avocados, nuts, olive oil), and plenty of fruits and vegetables. Try to distribute calories as approximately 30% protein, 40% carbs, and 30% healthy fats.",
+    "workout": "For an effective workout routine, combine cardio (running, cycling, swimming) with strength training (weights, resistance bands, bodyweight exercises). Aim for 150 minutes of moderate activity per week with 2-3 strength sessions. Always include warm-up and cool-down periods.",
+    "weight loss": "Sustainable weight loss combines a moderate calorie deficit (300-500 calories/day), regular physical activity, adequate protein intake, and sufficient sleep. Focus on whole foods, increase vegetable intake, and stay well-hydrated.",
+    "nutrition": "Good nutrition requires a balanced intake of macronutrients (proteins, carbs, fats) and micronutrients (vitamins and minerals). Prioritize whole foods like vegetables, fruits, lean proteins, whole grains, and healthy fats while limiting processed foods, added sugars, and excessive sodium.",
+    "protein": "Good protein sources include lean meats (chicken, turkey), fish (salmon, tuna), dairy (Greek yogurt, cottage cheese), eggs, legumes (beans, lentils), tofu, tempeh, and protein supplements like whey or plant-based protein powders.",
+  };
+
+  // Function to get a default response based on keywords in the message
+  const getDefaultResponse = (userMessage: string): string => {
+    const lowercaseMessage = userMessage.toLowerCase();
+    
+    for (const [keyword, response] of Object.entries(defaultResponses)) {
+      if (lowercaseMessage.includes(keyword)) {
+        return response;
+      }
+    }
+    
+    return "I can help you with questions about calories, meal planning, workouts, weight loss, nutrition, and protein sources. What would you like to know about today?";
+  };
+
   const sendMessageMutation = useMutation({
     mutationFn: async (content: string) => {
-      const res = await apiRequest("POST", "/api/chat", { content });
-      return await res.json();
+      try {
+        const res = await apiRequest("POST", "/api/chat", { content });
+        return await res.json();
+      } catch (error) {
+        // If API fails, use our default response system
+        return { 
+          response: getDefaultResponse(content),
+          isDefault: true 
+        };
+      }
     },
-    onSuccess: (data: { response: string }) => {
+    onSuccess: (data: { response: string, isDefault?: boolean }) => {
       // Add assistant's response to chat
       setChatHistory((prev) => [
         ...prev,
@@ -52,6 +83,14 @@ export default function ChatBot() {
           timestamp: new Date(),
         },
       ]);
+      
+      // If using default response, show a toast message
+      if (data.isDefault) {
+        toast({
+          title: "Using Demo Mode",
+          description: "Showing sample responses as the AI connection is unavailable",
+        });
+      }
     },
     onError: (error: Error) => {
       toast({

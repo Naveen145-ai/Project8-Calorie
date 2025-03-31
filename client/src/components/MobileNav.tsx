@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Home, Camera, UtensilsCrossed, Salad, Dumbbell, History, LogOut, Sparkles } from "lucide-react";
+import { Menu, X, Home, Camera, UtensilsCrossed, Salad, Dumbbell, History, LogOut, Sparkles, User } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +29,7 @@ export default function MobileNav() {
     { label: "Workout", icon: <Dumbbell className="w-5 h-5 mr-2" />, href: "/workout-plans" },
     { label: "History", icon: <History className="w-5 h-5 mr-2" />, href: "/history" },
     { label: "For You", icon: <Sparkles className="w-5 h-5 mr-2" />, href: "/recommendations" },
+    { label: "Profile", icon: <User className="w-5 h-5 mr-2" />, href: "/profile" },
   ];
 
   return (

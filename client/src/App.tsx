@@ -11,6 +11,7 @@ import WorkoutPlans from "@/pages/workout-plans";
 import AlternativesPage from "@/pages/alternatives";
 import HistoryPage from "@/pages/history";
 import ScanFood from "@/pages/scan-food";
+import ProfilePage from "@/pages/profile";
 import RecommendationsPage from "@/pages/recommendations";
 import { ProtectedRoute } from "./lib/protected-route";
 
@@ -54,6 +55,7 @@ function Router() {
       <ProtectedRoute path="/food-analysis" component={() => <ProtectedPageWithChat component={FoodAnalysis} />} />
       <ProtectedRoute path="/history" component={() => <ProtectedPageWithChat component={HistoryPage} />} />
       <ProtectedRoute path="/recommendations" component={() => <ProtectedPageWithChat component={RecommendationsPage} />} />
+      <ProtectedRoute path="/profile" component={() => <ProtectedPageWithChat component={ProfilePage} />} />
       
       {/* Fallback route */}
       <Route component={NotFound} />
