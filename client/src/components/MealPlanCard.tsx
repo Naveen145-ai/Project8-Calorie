@@ -2,10 +2,12 @@ import { useState } from "react";
 import { MealPlan } from "@shared/schema";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Trash2, ChevronRight, Utensils, Info } from "lucide-react";
-import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { UtensilsCrossed, AlertTriangle, FileText, Trash2, Calendar, Download } from "lucide-react";
+import { format } from "date-fns";
 
 interface MealPlanCardProps {
   mealPlan: MealPlan;
@@ -13,322 +15,367 @@ interface MealPlanCardProps {
 }
 
 export default function MealPlanCard({ mealPlan, onDelete }: MealPlanCardProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
+  const meals = mealPlan.meals as any;
 
-  const totalCalories = mealPlan.calories || 
-    Object.values(mealPlan.meals).reduce((total, meal) => {
-      if (Array.isArray(meal)) {
-        return total + meal.reduce((sum, m) => sum + (m.macros?.calories || 0), 0);
-      }
-      return total + (meal.macros?.calories || 0);
-    }, 0);
+  const handleDownloadPDF = () => {
+    // Mock PDF generation
+    alert("PDF download functionality would be implemented here");
+  };
 
   return (
     <>
-      <Card className="overflow-hidden hover:shadow-md transition-shadow">
-        <CardHeader className="bg-primary/5 pb-2">
-          <CardTitle className="flex justify-between items-center">
-            <span>{mealPlan.name}</span>
-            <Button variant="ghost" size="icon" onClick={onDelete}>
-              <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-            </Button>
-          </CardTitle>
-          <CardDescription>
-            Created on {formatDate(mealPlan.createdAt)}
+      <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow">
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-start">
+            <CardTitle className="text-lg font-semibold line-clamp-1">
+              {mealPlan.name}
+            </CardTitle>
+          </div>
+          <CardDescription className="flex items-center gap-1 text-xs mt-1">
+            <Calendar className="h-3 w-3" />
+            {mealPlan.createdAt ? format(new Date(mealPlan.createdAt), "MMM d, yyyy") : "Recent"}
           </CardDescription>
         </CardHeader>
-        <CardContent className="pt-4">
-          <p className="text-sm text-muted-foreground mb-4">{mealPlan.description}</p>
+        <CardContent className="flex-grow pb-0">
+          <p className="text-sm line-clamp-2 mb-3">
+            {mealPlan.description}
+          </p>
           
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <Utensils className="h-4 w-4 text-primary" />
-              </div>
-              <span className="font-medium">{totalCalories} calories</span>
-            </div>
-            <div className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
-              {Object.keys(mealPlan.meals).length} meals
-            </div>
-          </div>
-          
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="breakfast">
-              <AccordionTrigger>Breakfast</AccordionTrigger>
-              <AccordionContent>
-                <p className="font-medium">{mealPlan.meals.breakfast?.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {mealPlan.meals.breakfast?.macros?.calories} kcal
-                </p>
-              </AccordionContent>
-            </AccordionItem>
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Badge variant="secondary" className="flex items-center gap-1">
+              <UtensilsCrossed className="h-3 w-3" />
+              {mealPlan.calories} cal
+            </Badge>
             
-            <AccordionItem value="lunch">
-              <AccordionTrigger>Lunch</AccordionTrigger>
-              <AccordionContent>
-                <p className="font-medium">{mealPlan.meals.lunch?.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {mealPlan.meals.lunch?.macros?.calories} kcal
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-            
-            <AccordionItem value="dinner">
-              <AccordionTrigger>Dinner</AccordionTrigger>
-              <AccordionContent>
-                <p className="font-medium">{mealPlan.meals.dinner?.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {mealPlan.meals.dinner?.macros?.calories} kcal
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-            
-            {mealPlan.meals.snacks && mealPlan.meals.snacks.length > 0 && (
-              <AccordionItem value="snacks">
-                <AccordionTrigger>Snacks</AccordionTrigger>
-                <AccordionContent>
-                  {mealPlan.meals.snacks.map((snack, index) => (
-                    <div key={index} className="mb-2 last:mb-0">
-                      <p className="font-medium">{snack.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {snack.macros?.calories} kcal
-                      </p>
-                    </div>
-                  ))}
-                </AccordionContent>
-              </AccordionItem>
+            {meals?.breakfast && (
+              <Badge variant="outline" className="text-xs">
+                Breakfast
+              </Badge>
             )}
-          </Accordion>
+            
+            {meals?.lunch && (
+              <Badge variant="outline" className="text-xs">
+                Lunch
+              </Badge>
+            )}
+            
+            {meals?.dinner && (
+              <Badge variant="outline" className="text-xs">
+                Dinner
+              </Badge>
+            )}
+            
+            {meals?.snacks && meals.snacks.length > 0 && (
+              <Badge variant="outline" className="text-xs">
+                {meals.snacks.length} Snacks
+              </Badge>
+            )}
+          </div>
         </CardContent>
-        <CardFooter className="bg-muted/30 pt-2">
-          <Button variant="ghost" className="w-full" onClick={() => setIsOpen(true)}>
-            <Info className="h-4 w-4 mr-2" />
-            View Full Details
-          </Button>
-        </CardFooter>
-      </Card>
-      
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{mealPlan.name}</DialogTitle>
-            <DialogDescription>{mealPlan.description}</DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-6 py-2">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
-                {totalCalories} calories
+        
+        <CardFooter className="pt-3 pb-4 flex gap-2">
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="w-full flex-1">View Plan</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+              <DialogHeader>
+                <DialogTitle>{mealPlan.name}</DialogTitle>
+                <DialogDescription>
+                  {mealPlan.description}
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="flex items-center gap-2 mt-2 mb-6">
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <UtensilsCrossed className="h-3 w-3" />
+                  {mealPlan.calories} calories/day
+                </Badge>
               </div>
-              <div className="text-sm text-muted-foreground">
-                Created on {formatDate(mealPlan.createdAt)}
-              </div>
-            </div>
-            
-            {/* Breakfast */}
-            <div className="border rounded-lg overflow-hidden">
-              <div className="bg-primary/5 px-4 py-3 font-semibold flex items-center justify-between">
-                <span>Breakfast</span>
-                <span className="text-sm text-muted-foreground">
-                  {mealPlan.meals.breakfast?.macros?.calories} kcal
-                </span>
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold mb-2">{mealPlan.meals.breakfast?.name}</h3>
+              
+              <Tabs defaultValue="breakfast" className="flex-grow flex flex-col overflow-hidden">
+                <TabsList className="flex-shrink-0">
+                  {meals?.breakfast && <TabsTrigger value="breakfast">Breakfast</TabsTrigger>}
+                  {meals?.lunch && <TabsTrigger value="lunch">Lunch</TabsTrigger>}
+                  {meals?.dinner && <TabsTrigger value="dinner">Dinner</TabsTrigger>}
+                  {meals?.snacks && meals.snacks.length > 0 && <TabsTrigger value="snacks">Snacks</TabsTrigger>}
+                </TabsList>
                 
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-muted-foreground mb-2">Ingredients</h4>
-                  <ul className="list-disc list-inside text-sm space-y-1">
-                    {mealPlan.meals.breakfast?.ingredients?.map((ingredient, i) => (
-                      <motion.li 
-                        key={i}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                      >
-                        {ingredient}
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-muted-foreground mb-2">Preparation</h4>
-                  <p className="text-sm">{mealPlan.meals.breakfast?.preparation}</p>
-                </div>
-                
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-2">Nutritional Info</h4>
-                  <div className="flex gap-3">
-                    <span className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-700">
-                      Protein: {mealPlan.meals.breakfast?.macros?.protein}g
-                    </span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700">
-                      Carbs: {mealPlan.meals.breakfast?.macros?.carbs}g
-                    </span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-amber-50 text-amber-700">
-                      Fats: {mealPlan.meals.breakfast?.macros?.fats}g
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Lunch */}
-            <div className="border rounded-lg overflow-hidden">
-              <div className="bg-primary/5 px-4 py-3 font-semibold flex items-center justify-between">
-                <span>Lunch</span>
-                <span className="text-sm text-muted-foreground">
-                  {mealPlan.meals.lunch?.macros?.calories} kcal
-                </span>
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold mb-2">{mealPlan.meals.lunch?.name}</h3>
-                
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-muted-foreground mb-2">Ingredients</h4>
-                  <ul className="list-disc list-inside text-sm space-y-1">
-                    {mealPlan.meals.lunch?.ingredients?.map((ingredient, i) => (
-                      <motion.li 
-                        key={i}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                      >
-                        {ingredient}
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-muted-foreground mb-2">Preparation</h4>
-                  <p className="text-sm">{mealPlan.meals.lunch?.preparation}</p>
-                </div>
-                
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-2">Nutritional Info</h4>
-                  <div className="flex gap-3">
-                    <span className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-700">
-                      Protein: {mealPlan.meals.lunch?.macros?.protein}g
-                    </span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700">
-                      Carbs: {mealPlan.meals.lunch?.macros?.carbs}g
-                    </span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-amber-50 text-amber-700">
-                      Fats: {mealPlan.meals.lunch?.macros?.fats}g
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Dinner */}
-            <div className="border rounded-lg overflow-hidden">
-              <div className="bg-primary/5 px-4 py-3 font-semibold flex items-center justify-between">
-                <span>Dinner</span>
-                <span className="text-sm text-muted-foreground">
-                  {mealPlan.meals.dinner?.macros?.calories} kcal
-                </span>
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold mb-2">{mealPlan.meals.dinner?.name}</h3>
-                
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-muted-foreground mb-2">Ingredients</h4>
-                  <ul className="list-disc list-inside text-sm space-y-1">
-                    {mealPlan.meals.dinner?.ingredients?.map((ingredient, i) => (
-                      <motion.li 
-                        key={i}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                      >
-                        {ingredient}
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-muted-foreground mb-2">Preparation</h4>
-                  <p className="text-sm">{mealPlan.meals.dinner?.preparation}</p>
-                </div>
-                
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-2">Nutritional Info</h4>
-                  <div className="flex gap-3">
-                    <span className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-700">
-                      Protein: {mealPlan.meals.dinner?.macros?.protein}g
-                    </span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700">
-                      Carbs: {mealPlan.meals.dinner?.macros?.carbs}g
-                    </span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-amber-50 text-amber-700">
-                      Fats: {mealPlan.meals.dinner?.macros?.fats}g
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Snacks */}
-            {mealPlan.meals.snacks && mealPlan.meals.snacks.length > 0 && (
-              <div className="border rounded-lg overflow-hidden">
-                <div className="bg-primary/5 px-4 py-3 font-semibold">
-                  Snacks
-                </div>
-                <div className="p-4">
-                  {mealPlan.meals.snacks.map((snack, index) => (
-                    <div key={index} className="mb-6 last:mb-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-semibold">{snack.name}</h3>
-                        <span className="text-sm text-muted-foreground">
-                          {snack.macros?.calories} kcal
-                        </span>
-                      </div>
-                      
-                      <div className="mb-4">
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2">Ingredients</h4>
-                        <ul className="list-disc list-inside text-sm space-y-1">
-                          {snack.ingredients?.map((ingredient, i) => (
-                            <li key={i}>{ingredient}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      
-                      <div className="mb-4">
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2">Preparation</h4>
-                        <p className="text-sm">{snack.preparation}</p>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2">Nutritional Info</h4>
-                        <div className="flex gap-3">
-                          <span className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-700">
-                            Protein: {snack.macros?.protein}g
-                          </span>
-                          <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700">
-                            Carbs: {snack.macros?.carbs}g
-                          </span>
-                          <span className="text-xs px-2 py-1 rounded-full bg-amber-50 text-amber-700">
-                            Fats: {snack.macros?.fats}g
-                          </span>
+                <ScrollArea className="flex-grow mt-4">
+                  {meals?.breakfast && (
+                    <TabsContent value="breakfast" className="mt-0 p-4">
+                      <div className="space-y-4">
+                        <div>
+                          <h3 className="text-xl font-semibold mb-1">{meals.breakfast.name}</h3>
+                          <p className="text-muted-foreground text-sm">{meals.breakfast.macros.calories} calories</p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-medium mb-2">Ingredients</h4>
+                          <ul className="list-disc list-inside space-y-1">
+                            {meals.breakfast.ingredients.map((ingredient: string, i: number) => (
+                              <li key={i} className="text-sm">{ingredient}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-medium mb-2">Preparation</h4>
+                          <p className="text-sm">{meals.breakfast.preparation}</p>
+                        </div>
+                        
+                        <div className="bg-muted rounded-md p-3">
+                          <h4 className="font-medium mb-2">Nutritional Information</h4>
+                          <div className="grid grid-cols-3 gap-2 text-sm">
+                            <div>
+                              <p className="text-muted-foreground">Calories</p>
+                              <p className="font-medium">{meals.breakfast.macros.calories} kcal</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Protein</p>
+                              <p className="font-medium">{meals.breakfast.macros.protein}g</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Carbs</p>
+                              <p className="font-medium">{meals.breakfast.macros.carbs}g</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Fats</p>
+                              <p className="font-medium">{meals.breakfast.macros.fats}g</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
+                    </TabsContent>
+                  )}
+                  
+                  {meals?.lunch && (
+                    <TabsContent value="lunch" className="mt-0 p-4">
+                      <div className="space-y-4">
+                        <div>
+                          <h3 className="text-xl font-semibold mb-1">{meals.lunch.name}</h3>
+                          <p className="text-muted-foreground text-sm">{meals.lunch.macros.calories} calories</p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-medium mb-2">Ingredients</h4>
+                          <ul className="list-disc list-inside space-y-1">
+                            {meals.lunch.ingredients.map((ingredient: string, i: number) => (
+                              <li key={i} className="text-sm">{ingredient}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-medium mb-2">Preparation</h4>
+                          <p className="text-sm">{meals.lunch.preparation}</p>
+                        </div>
+                        
+                        <div className="bg-muted rounded-md p-3">
+                          <h4 className="font-medium mb-2">Nutritional Information</h4>
+                          <div className="grid grid-cols-3 gap-2 text-sm">
+                            <div>
+                              <p className="text-muted-foreground">Calories</p>
+                              <p className="font-medium">{meals.lunch.macros.calories} kcal</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Protein</p>
+                              <p className="font-medium">{meals.lunch.macros.protein}g</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Carbs</p>
+                              <p className="font-medium">{meals.lunch.macros.carbs}g</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Fats</p>
+                              <p className="font-medium">{meals.lunch.macros.fats}g</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </TabsContent>
+                  )}
+                  
+                  {meals?.dinner && (
+                    <TabsContent value="dinner" className="mt-0 p-4">
+                      <div className="space-y-4">
+                        <div>
+                          <h3 className="text-xl font-semibold mb-1">{meals.dinner.name}</h3>
+                          <p className="text-muted-foreground text-sm">{meals.dinner.macros.calories} calories</p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-medium mb-2">Ingredients</h4>
+                          <ul className="list-disc list-inside space-y-1">
+                            {meals.dinner.ingredients.map((ingredient: string, i: number) => (
+                              <li key={i} className="text-sm">{ingredient}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-medium mb-2">Preparation</h4>
+                          <p className="text-sm">{meals.dinner.preparation}</p>
+                        </div>
+                        
+                        <div className="bg-muted rounded-md p-3">
+                          <h4 className="font-medium mb-2">Nutritional Information</h4>
+                          <div className="grid grid-cols-3 gap-2 text-sm">
+                            <div>
+                              <p className="text-muted-foreground">Calories</p>
+                              <p className="font-medium">{meals.dinner.macros.calories} kcal</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Protein</p>
+                              <p className="font-medium">{meals.dinner.macros.protein}g</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Carbs</p>
+                              <p className="font-medium">{meals.dinner.macros.carbs}g</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Fats</p>
+                              <p className="font-medium">{meals.dinner.macros.fats}g</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </TabsContent>
+                  )}
+                  
+                  {meals?.snacks && meals.snacks.length > 0 && (
+                    <TabsContent value="snacks" className="mt-0 p-4">
+                      <div className="space-y-8">
+                        {meals.snacks.map((snack: any, index: number) => (
+                          <div key={index} className="space-y-4 pb-6 border-b last:border-0 last:pb-0">
+                            <div>
+                              <h3 className="text-xl font-semibold mb-1">{snack.name}</h3>
+                              <p className="text-muted-foreground text-sm">{snack.macros.calories} calories</p>
+                            </div>
+                            
+                            <div>
+                              <h4 className="font-medium mb-2">Ingredients</h4>
+                              <ul className="list-disc list-inside space-y-1">
+                                {snack.ingredients.map((ingredient: string, i: number) => (
+                                  <li key={i} className="text-sm">{ingredient}</li>
+                                ))}
+                              </ul>
+                            </div>
+                            
+                            <div>
+                              <h4 className="font-medium mb-2">Preparation</h4>
+                              <p className="text-sm">{snack.preparation}</p>
+                            </div>
+                            
+                            <div className="bg-muted rounded-md p-3">
+                              <h4 className="font-medium mb-2">Nutritional Information</h4>
+                              <div className="grid grid-cols-3 gap-2 text-sm">
+                                <div>
+                                  <p className="text-muted-foreground">Calories</p>
+                                  <p className="font-medium">{snack.macros.calories} kcal</p>
+                                </div>
+                                <div>
+                                  <p className="text-muted-foreground">Protein</p>
+                                  <p className="font-medium">{snack.macros.protein}g</p>
+                                </div>
+                                <div>
+                                  <p className="text-muted-foreground">Carbs</p>
+                                  <p className="font-medium">{snack.macros.carbs}g</p>
+                                </div>
+                                <div>
+                                  <p className="text-muted-foreground">Fats</p>
+                                  <p className="font-medium">{snack.macros.fats}g</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </TabsContent>
+                  )}
+                </ScrollArea>
+              </Tabs>
+              
+              <div className="flex justify-between items-center mt-4 pt-4 border-t">
+                <Button variant="outline" onClick={handleDownloadPDF} className="flex items-center gap-2">
+                  <Download className="h-4 w-4" />
+                  Download PDF
+                </Button>
+                
+                <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="destructive" size="sm" className="flex items-center gap-2">
+                      <Trash2 className="h-4 w-4" />
+                      Delete Plan
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5 text-destructive" />
+                        Delete Meal Plan
+                      </DialogTitle>
+                      <DialogDescription>
+                        Are you sure you want to delete this meal plan? This action cannot be undone.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex justify-end gap-2 mt-4">
+                      <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        onClick={() => {
+                          onDelete();
+                          setIsConfirmOpen(false);
+                          setIsDialogOpen(false);
+                        }}
+                      >
+                        Delete
+                      </Button>
                     </div>
-                  ))}
-                </div>
+                  </DialogContent>
+                </Dialog>
               </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+            </DialogContent>
+          </Dialog>
+          
+          <Button variant="ghost" size="icon" onClick={() => setIsConfirmOpen(true)}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+          
+          <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                  Delete Meal Plan
+                </DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to delete this meal plan? This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>
+                  Cancel
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={() => {
+                    onDelete();
+                    setIsConfirmOpen(false);
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </CardFooter>
+      </Card>
     </>
   );
 }

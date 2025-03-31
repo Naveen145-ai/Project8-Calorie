@@ -64,10 +64,15 @@ function Router() {
 }
 
 function App() {
+  const ChatBot = React.lazy(() => import('@/components/ChatBot'));
+  
   return (
     <>
       <Router />
       <Toaster />
+      <React.Suspense fallback={null}>
+        <ChatBot />
+      </React.Suspense>
     </>
   );
 }
