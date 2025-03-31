@@ -1,6 +1,4 @@
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Leaf, ArrowRight } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 
 interface FoodAlternativeProps {
   name: string;
@@ -10,23 +8,20 @@ interface FoodAlternativeProps {
 
 export default function FoodAlternative({ name, calories, benefits }: FoodAlternativeProps) {
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold text-lg">{name}</h3>
-          <Badge variant="outline" className="font-normal">{calories} kcal</Badge>
+    <div className="flex flex-col md:flex-row items-start gap-4">
+      <div className="bg-primary/10 p-3 rounded-lg text-center flex-shrink-0 w-full md:w-36">
+        <h4 className="font-semibold text-lg">{name}</h4>
+        <div className="flex items-center justify-center gap-2 mt-2">
+          <ArrowDown className="h-4 w-4 text-green-600" />
+          <p className="text-xl font-bold">{calories}</p>
         </div>
-        <div className="flex items-start gap-2 text-sm text-muted-foreground">
-          <Leaf className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-          <p>{benefits}</p>
-        </div>
-      </CardContent>
-      <CardFooter className="bg-muted/20 p-3 flex justify-between items-center">
-        <div className="flex items-center text-xs text-muted-foreground">
-          <ArrowRight className="h-3 w-3 mr-1" />
-          <span>Healthier Alternative</span>
-        </div>
-      </CardFooter>
-    </Card>
+        <p className="text-xs text-muted-foreground mt-1">calories</p>
+      </div>
+      
+      <div className="w-full">
+        <h4 className="font-medium mb-1">Benefits</h4>
+        <p className="text-sm text-muted-foreground">{benefits}</p>
+      </div>
+    </div>
   );
 }

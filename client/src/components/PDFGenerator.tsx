@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { FoodEntry } from "@shared/schema";
-import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import jsPDF from "jspdf";
-import "jspdf/dist/polyfills.es.js";
+import { format } from "date-fns";
 
 interface PDFGeneratorProps {
   foodEntry: FoodEntry;
@@ -12,144 +11,249 @@ interface PDFGeneratorProps {
 
 export default function PDFGenerator({ foodEntry }: PDFGeneratorProps) {
   const [isGenerating, setIsGenerating] = useState(false);
-  const { toast } = useToast();
-
+  
   const generatePDF = async () => {
+    setIsGenerating(true);
     try {
-      setIsGenerating(true);
-      
-      // Create new PDF document
-      const doc = new jsPDF();
+      // Create a new PDF document
+      const pdf = new jsPDF();
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      let yPosition = 20;
       
       // Add title
-      doc.setFontSize(20);
-      doc.setTextColor(76, 175, 80); // Primary color
-      doc.text("NutriScan AI - Nutrition Report", 105, 20, { align: "center" });
-      
-      // Add food name
-      doc.setFontSize(16);
-      doc.setTextColor(0, 0, 0);
-      doc.text(`Food: ${foodEntry.name}`, 20, 40);
+      pdf.setFontSize(22);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text("Nutrition Analysis Report", pageWidth / 2, yPosition, { align: "center" });
+      yPosition += 10;
       
       // Add date
-      const date = new Date(foodEntry.timestamp).toLocaleDateString();
-      doc.setFontSize(12);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Date: ${date}`, 20, 50);
+      pdf.setFontSize(10);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`Generated on ${format(new Date(), "MMMM d, yyyy")}`, pageWidth / 2, yPosition, { align: "center" });
+      yPosition += 15;
       
-      // Add horizontal line
-      doc.setDrawColor(200, 200, 200);
-      doc.line(20, 55, 190, 55);
+      // Add food name
+      pdf.setFontSize(16);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(`Food Item: ${foodEntry.name}`, 20, yPosition);
+      yPosition += 15;
       
-      // Main nutritional info
-      doc.setFontSize(14);
-      doc.setTextColor(0, 0, 0);
-      doc.text("Nutritional Information", 20, 65);
-      
-      doc.setFontSize(12);
-      doc.text(`Calories: ${foodEntry.calories || 0} kcal`, 30, 75);
-      doc.text(`Protein: ${foodEntry.protein || 0} g`, 30, 85);
-      doc.text(`Carbohydrates: ${foodEntry.carbs || 0} g`, 30, 95);
-      doc.text(`Fats: ${foodEntry.fats || 0} g`, 30, 105);
-      
-      // Micronutrients
-      if (foodEntry.nutrients) {
-        let yPos = 120;
-        
-        // Vitamins
-        if (Object.keys(foodEntry.nutrients.vitamins || {}).length > 0) {
-          doc.setFontSize(14);
-          doc.text("Vitamins", 20, yPos);
-          yPos += 10;
+      // If there's an image, add it
+      if (foodEntry.imageUrl) {
+        try {
+          // Create an image element to load the URL
+          const img = new Image();
+          img.crossOrigin = "Anonymous";
+          img.src = foodEntry.imageUrl;
           
-          doc.setFontSize(12);
-          Object.entries(foodEntry.nutrients.vitamins || {}).forEach(([vitamin, value]) => {
-            doc.text(`${vitamin}: ${value} mg`, 30, yPos);
-            yPos += 8;
-            
-            // Add new page if needed
-            if (yPos > 270) {
-              doc.addPage();
-              yPos = 20;
-            }
+          // Wait for the image to load
+          await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
           });
-        }
-        
-        // Minerals
-        if (Object.keys(foodEntry.nutrients.minerals || {}).length > 0) {
-          doc.setFontSize(14);
-          doc.text("Minerals", 20, yPos);
-          yPos += 10;
           
-          doc.setFontSize(12);
-          Object.entries(foodEntry.nutrients.minerals || {}).forEach(([mineral, value]) => {
-            doc.text(`${mineral}: ${value} mg`, 30, yPos);
-            yPos += 8;
-            
-            // Add new page if needed
-            if (yPos > 270) {
-              doc.addPage();
-              yPos = 20;
-            }
-          });
-        }
-        
-        // Fiber and sugar
-        if (foodEntry.nutrients.fiber || foodEntry.nutrients.sugar) {
-          yPos += 5;
-          if (foodEntry.nutrients.fiber) {
-            doc.text(`Fiber: ${foodEntry.nutrients.fiber} g`, 30, yPos);
-            yPos += 8;
-          }
-          
-          if (foodEntry.nutrients.sugar) {
-            doc.text(`Sugar: ${foodEntry.nutrients.sugar} g`, 30, yPos);
-            yPos += 8;
-          }
+          // Add the image to the PDF
+          const imgWidth = 80;
+          const imgHeight = (img.height * imgWidth) / img.width;
+          pdf.addImage(img, "JPEG", 20, yPosition, imgWidth, imgHeight);
+          yPosition += imgHeight + 15;
+        } catch (error) {
+          console.error("Failed to add image to PDF:", error);
+          yPosition += 10;
         }
       }
       
-      // Footer
-      const pageCount = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(10);
-        doc.setTextColor(150, 150, 150);
-        doc.text(`Generated by NutriScan AI - Page ${i} of ${pageCount}`, 105, 285, { align: "center" });
+      // Add macronutrients section
+      pdf.setFontSize(14);
+      pdf.text("Nutritional Information", 20, yPosition);
+      yPosition += 8;
+      
+      pdf.setFontSize(10);
+      pdf.setDrawColor(200, 200, 200);
+      pdf.line(20, yPosition, pageWidth - 20, yPosition);
+      yPosition += 10;
+      
+      // Add calorie information
+      pdf.setFontSize(12);
+      pdf.text(`Calories: ${foodEntry.calories}`, 20, yPosition);
+      yPosition += 8;
+      
+      // Add macronutrients
+      const macros = [
+        { name: "Protein", value: `${foodEntry.protein}g` },
+        { name: "Carbohydrates", value: `${foodEntry.carbs}g` },
+        { name: "Fats", value: `${foodEntry.fats}g` },
+        { name: "Fiber", value: `${foodEntry.nutrients?.fiber || 0}g` },
+        { name: "Sugar", value: `${foodEntry.nutrients?.sugar || 0}g` }
+      ];
+      
+      macros.forEach(macro => {
+        pdf.text(`${macro.name}: ${macro.value}`, 20, yPosition);
+        yPosition += 7;
+      });
+      
+      yPosition += 5;
+      
+      // Add vitamins section if available
+      if (foodEntry.nutrients?.vitamins && Object.keys(foodEntry.nutrients.vitamins).length > 0) {
+        pdf.setFontSize(14);
+        pdf.text("Vitamins", 20, yPosition);
+        yPosition += 8;
+        
+        pdf.setDrawColor(200, 200, 200);
+        pdf.line(20, yPosition, pageWidth - 20, yPosition);
+        yPosition += 10;
+        
+        pdf.setFontSize(10);
+        
+        // Create two columns for vitamins
+        const vitaminEntries = Object.entries(foodEntry.nutrients.vitamins);
+        const midPoint = Math.ceil(vitaminEntries.length / 2);
+        
+        const leftColumn = vitaminEntries.slice(0, midPoint);
+        const rightColumn = vitaminEntries.slice(midPoint);
+        
+        const startYPosition = yPosition;
+        
+        // Left column
+        leftColumn.forEach(([vitamin, amount]) => {
+          pdf.text(`${vitamin}: ${amount}mg`, 20, yPosition);
+          yPosition += 6;
+        });
+        
+        // Reset Y position for right column
+        yPosition = startYPosition;
+        
+        // Right column
+        rightColumn.forEach(([vitamin, amount]) => {
+          pdf.text(`${vitamin}: ${amount}mg`, pageWidth / 2, yPosition);
+          yPosition += 6;
+        });
+        
+        // Set Y position to the end of the longer column
+        yPosition = Math.max(
+          startYPosition + leftColumn.length * 6,
+          startYPosition + rightColumn.length * 6
+        );
+        
+        yPosition += 5;
       }
+      
+      // Add minerals section if available
+      if (foodEntry.nutrients?.minerals && Object.keys(foodEntry.nutrients.minerals).length > 0) {
+        pdf.setFontSize(14);
+        pdf.text("Minerals", 20, yPosition);
+        yPosition += 8;
+        
+        pdf.setDrawColor(200, 200, 200);
+        pdf.line(20, yPosition, pageWidth - 20, yPosition);
+        yPosition += 10;
+        
+        pdf.setFontSize(10);
+        
+        // Create two columns for minerals
+        const mineralEntries = Object.entries(foodEntry.nutrients.minerals);
+        const midPoint = Math.ceil(mineralEntries.length / 2);
+        
+        const leftColumn = mineralEntries.slice(0, midPoint);
+        const rightColumn = mineralEntries.slice(midPoint);
+        
+        const startYPosition = yPosition;
+        
+        // Left column
+        leftColumn.forEach(([mineral, amount]) => {
+          pdf.text(`${mineral}: ${amount}mg`, 20, yPosition);
+          yPosition += 6;
+        });
+        
+        // Reset Y position for right column
+        yPosition = startYPosition;
+        
+        // Right column
+        rightColumn.forEach(([mineral, amount]) => {
+          pdf.text(`${mineral}: ${amount}mg`, pageWidth / 2, yPosition);
+          yPosition += 6;
+        });
+        
+        // Set Y position to the end of the longer column
+        yPosition = Math.max(
+          startYPosition + leftColumn.length * 6,
+          startYPosition + rightColumn.length * 6
+        );
+        
+        yPosition += 10;
+      }
+      
+      // Add daily value information
+      pdf.setFontSize(14);
+      pdf.text("Daily Value (% based on 2,000 calorie diet)", 20, yPosition);
+      yPosition += 8;
+      
+      pdf.setDrawColor(200, 200, 200);
+      pdf.line(20, yPosition, pageWidth - 20, yPosition);
+      yPosition += 10;
+      
+      pdf.setFontSize(10);
+      
+      const dailyValues = [
+        { name: "Calories", value: `${Math.round((foodEntry.calories / 2000) * 100)}%` },
+        { name: "Protein", value: `${Math.round((foodEntry.protein / 50) * 100)}%` },
+        { name: "Carbohydrates", value: `${Math.round((foodEntry.carbs / 300) * 100)}%` },
+        { name: "Fats", value: `${Math.round((foodEntry.fats / 65) * 100)}%` },
+        { name: "Fiber", value: `${Math.round(((foodEntry.nutrients?.fiber || 0) / 28) * 100)}%` }
+      ];
+      
+      // Create two columns for daily values
+      const midPoint = Math.ceil(dailyValues.length / 2);
+      
+      const leftColumn = dailyValues.slice(0, midPoint);
+      const rightColumn = dailyValues.slice(midPoint);
+      
+      const startYPosition = yPosition;
+      
+      // Left column
+      leftColumn.forEach(item => {
+        pdf.text(`${item.name}: ${item.value}`, 20, yPosition);
+        yPosition += 6;
+      });
+      
+      // Reset Y position for right column
+      yPosition = startYPosition;
+      
+      // Right column
+      rightColumn.forEach(item => {
+        pdf.text(`${item.name}: ${item.value}`, pageWidth / 2, yPosition);
+        yPosition += 6;
+      });
+      
+      // Add footer
+      pdf.setFontSize(8);
+      pdf.setTextColor(150, 150, 150);
+      pdf.text("Generated by Edibilize - AI Nutrition Analysis", pageWidth / 2, pdf.internal.pageSize.getHeight() - 10, {
+        align: "center"
+      });
       
       // Save the PDF
-      doc.save(`NutriScan_${foodEntry.name.replace(/\s+/g, '_')}_${date}.pdf`);
-      
-      toast({
-        title: "PDF Generated",
-        description: "Your nutrition report has been downloaded",
-      });
+      pdf.save(`${foodEntry.name.replace(/\s+/g, "_")}_nutrition_report.pdf`);
     } catch (error) {
-      console.error("PDF generation error:", error);
-      toast({
-        title: "PDF Generation Failed",
-        description: "There was an error generating your PDF report",
-        variant: "destructive",
-      });
+      console.error("Error generating PDF:", error);
     } finally {
       setIsGenerating(false);
     }
   };
-
+  
   return (
-    <Button
-      variant="outline"
-      className="w-full md:w-auto"
-      onClick={generatePDF}
+    <Button 
+      onClick={generatePDF} 
       disabled={isGenerating}
+      variant="default"
     >
       {isGenerating ? (
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
       ) : (
         <Download className="mr-2 h-4 w-4" />
       )}
-      Download PDF Report
+      Download PDF
     </Button>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Home, Image, Apple, Dumbbell, LogOut } from "lucide-react";
+import { Menu, X, Home, Camera, UtensilsCrossed, Salad, Dumbbell, History, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,10 +22,12 @@ export default function MobileNav() {
   };
 
   const menuItems = [
-    { label: "Home", icon: <Home className="w-5 h-5 mr-2" />, href: "/" },
-    { label: "Food Analysis", icon: <Image className="w-5 h-5 mr-2" />, href: "/food-analysis" },
-    { label: "Meal Planning", icon: <Apple className="w-5 h-5 mr-2" />, href: "/meal-planning" },
-    { label: "Workout Plans", icon: <Dumbbell className="w-5 h-5 mr-2" />, href: "/workout-plans" },
+    { label: "Dashboard", icon: <Home className="w-5 h-5 mr-2" />, href: "/" },
+    { label: "Scan Food", icon: <Camera className="w-5 h-5 mr-2" />, href: "/scan-food" },
+    { label: "Meal Plan", icon: <UtensilsCrossed className="w-5 h-5 mr-2" />, href: "/meal-planning" },
+    { label: "Alternatives", icon: <Salad className="w-5 h-5 mr-2" />, href: "/alternatives" },
+    { label: "Workout", icon: <Dumbbell className="w-5 h-5 mr-2" />, href: "/workout-plans" },
+    { label: "History", icon: <History className="w-5 h-5 mr-2" />, href: "/history" },
   ];
 
   return (

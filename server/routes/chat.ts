@@ -2,53 +2,69 @@ import { Router, Request, Response } from "express";
 import OpenAI from "openai";
 
 const router = Router();
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const MODEL = "gpt-4o";
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// Health assistant prompt
+const SYSTEM_PROMPT = `You are a helpful AI nutrition and health assistant for the Edibilize app.
+Your primary responsibilities are:
+
+1. Answering questions about nutrition, calories, and healthy eating habits
+2. Providing recommendations for healthier food alternatives
+3. Suggesting meal plans based on dietary preferences and health goals
+4. Offering basic workout advice that complements diet plans
+5. Explaining nutrition concepts in simple, accessible terms
+
+Guidelines:
+- Keep responses concise and easy to understand (under 250 words)
+- When discussing calories or nutritional info, note that these are estimates
+- Don't provide specific medical advice or diagnoses
+- If asked something outside your expertise, politely redirect to nutrition topics
+- Be supportive and encouraging, not judgmental about food choices
+- For specific medical concerns, suggest consulting healthcare professionals
+- Base your answers on scientific nutritional facts, not fad diets or trends
+
+Examples of appropriate topics:
+- Calorie content of common foods
+- Protein, carb, and fat recommendations
+- Meal planning suggestions
+- Understanding food labels
+- Healthier cooking methods
+- Basic nutrition science
+- General fitness advice that complements nutrition
+
+Keep your responses helpfully framed around nutrition and wellness.`;
 
 router.post("/api/chat", async (req: Request, res: Response) => {
   try {
-    const { message } = req.body;
+    const { content } = req.body;
     
-    if (!message) {
-      return res.status(400).json({ error: "Message is required" });
+    if (!content || typeof content !== "string") {
+      return res.status(400).json({ error: "Message content is required" });
     }
 
-    const response = await openai.chat.completions.create({
-      model: MODEL,
+    // Call OpenAI API to get health assistant response
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
       messages: [
-        {
-          role: "system",
-          content: `You are NutriScan Health Assistant, an AI specializing in nutrition, calorie estimation, meal planning, and fitness advice.
-          
-          Your primary functions are:
-          1. Answering questions about food nutrition and calories
-          2. Providing fitness and workout guidance
-          3. Offering meal planning suggestions
-          4. Explaining the benefits of different foods and exercises
-          
-          Keep your responses concise, friendly, and focused on health, fitness, and nutrition topics.
-          If asked about topics outside your expertise, politely redirect the conversation to health-related subjects.
-          
-          Today's date is ${new Date().toLocaleDateString()}.
-          `
-        },
-        { 
-          role: "user", 
-          content: message 
-        }
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content }
       ],
-      temperature: 0.7,
       max_tokens: 500,
+      temperature: 0.7,
     });
 
-    return res.status(200).json({
-      response: response.choices[0].message.content,
-    });
-  } catch (error) {
+    const response = completion.choices[0].message.content || "I'm sorry, I couldn't generate a response. Please try again.";
+    
+    return res.status(200).json({ response });
+  } catch (error: any) {
     console.error("Chat API error:", error);
-    return res.status(500).json({ error: "Failed to process chat request" });
+    return res.status(500).json({ 
+      error: "Failed to process chat message",
+      details: error.message || "Unknown error"
+    });
   }
 });
 

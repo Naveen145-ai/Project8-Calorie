@@ -39,19 +39,29 @@ export default function Header() {
                       Dashboard
                     </a>
                   </Link>
-                  <Link href="/food-analysis">
-                    <a className={`transition-colors hover:text-primary ${location === "/food-analysis" ? "text-primary" : ""}`}>
-                      Food Analysis
+                  <Link href="/scan-food">
+                    <a className={`transition-colors hover:text-primary ${location === "/scan-food" ? "text-primary" : ""}`}>
+                      Scan Food
                     </a>
                   </Link>
                   <Link href="/meal-planning">
                     <a className={`transition-colors hover:text-primary ${location === "/meal-planning" ? "text-primary" : ""}`}>
-                      Meal Planning
+                      Meal Plan
+                    </a>
+                  </Link>
+                  <Link href="/alternatives">
+                    <a className={`transition-colors hover:text-primary ${location === "/alternatives" ? "text-primary" : ""}`}>
+                      Alternatives
                     </a>
                   </Link>
                   <Link href="/workout-plans">
                     <a className={`transition-colors hover:text-primary ${location === "/workout-plans" ? "text-primary" : ""}`}>
-                      Workout Plans
+                      Workout
+                    </a>
+                  </Link>
+                  <Link href="/history">
+                    <a className={`transition-colors hover:text-primary ${location === "/history" ? "text-primary" : ""}`}>
+                      History
                     </a>
                   </Link>
                 </nav>
