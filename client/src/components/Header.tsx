@@ -34,41 +34,41 @@ export default function Header() {
             {user ? (
               <div className="flex items-center gap-6">
                 <nav className="flex items-center space-x-4 text-sm font-medium">
-                  <Link href="/">
-                    <a className={`transition-colors hover:text-primary ${location === "/" ? "text-primary" : ""}`}>
-                      Dashboard
-                    </a>
-                  </Link>
-                  <Link href="/scan-food">
-                    <a className={`transition-colors hover:text-primary ${location === "/scan-food" ? "text-primary" : ""}`}>
-                      Scan Food
-                    </a>
-                  </Link>
-                  <Link href="/meal-planning">
-                    <a className={`transition-colors hover:text-primary ${location === "/meal-planning" ? "text-primary" : ""}`}>
-                      Meal Plan
-                    </a>
-                  </Link>
-                  <Link href="/alternatives">
-                    <a className={`transition-colors hover:text-primary ${location === "/alternatives" ? "text-primary" : ""}`}>
-                      Alternatives
-                    </a>
-                  </Link>
-                  <Link href="/workout-plans">
-                    <a className={`transition-colors hover:text-primary ${location === "/workout-plans" ? "text-primary" : ""}`}>
-                      Workout
-                    </a>
-                  </Link>
-                  <Link href="/history">
-                    <a className={`transition-colors hover:text-primary ${location === "/history" ? "text-primary" : ""}`}>
-                      History
-                    </a>
-                  </Link>
-                  <Link href="/recommendations">
-                    <a className={`transition-colors hover:text-primary ${location === "/recommendations" ? "text-primary" : ""}`}>
-                      For You
-                    </a>
-                  </Link>
+                  <span 
+                    onClick={() => window.location.href = '/'}
+                    className={`transition-colors hover:text-primary ${location === "/" ? "text-primary" : ""} cursor-pointer`}>
+                    Dashboard
+                  </span>
+                  <span 
+                    onClick={() => window.location.href = '/scan-food'}
+                    className={`transition-colors hover:text-primary ${location === "/scan-food" ? "text-primary" : ""} cursor-pointer`}>
+                    Scan Food
+                  </span>
+                  <span 
+                    onClick={() => window.location.href = '/meal-planning'}
+                    className={`transition-colors hover:text-primary ${location === "/meal-planning" ? "text-primary" : ""} cursor-pointer`}>
+                    Meal Plan
+                  </span>
+                  <span 
+                    onClick={() => window.location.href = '/alternatives'}
+                    className={`transition-colors hover:text-primary ${location === "/alternatives" ? "text-primary" : ""} cursor-pointer`}>
+                    Alternatives
+                  </span>
+                  <span 
+                    onClick={() => window.location.href = '/workout-plans'}
+                    className={`transition-colors hover:text-primary ${location === "/workout-plans" ? "text-primary" : ""} cursor-pointer`}>
+                    Workout
+                  </span>
+                  <span 
+                    onClick={() => window.location.href = '/history'}
+                    className={`transition-colors hover:text-primary ${location === "/history" ? "text-primary" : ""} cursor-pointer`}>
+                    History
+                  </span>
+                  <span 
+                    onClick={() => window.location.href = '/recommendations'}
+                    className={`transition-colors hover:text-primary ${location === "/recommendations" ? "text-primary" : ""} cursor-pointer`}>
+                    For You
+                  </span>
                 </nav>
 
                 <div className="flex items-center gap-4">
@@ -92,25 +92,21 @@ export default function Header() {
                         </div>
                         
                         <div className="px-2 py-2">
-                          <Link href="/dashboard">
-                            <a className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-primary/10 transition-colors">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
-                                <rect width="3" height="9" x="7" y="7"></rect>
-                                <rect width="3" height="5" x="14" y="7"></rect>
-                              </svg>
-                              Dashboard
-                            </a>
-                          </Link>
-                          <Link href="/history">
-                            <a className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-primary/10 transition-colors">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
-                              </svg>
-                              History
-                            </a>
-                          </Link>
+                                  <div className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-primary/10 transition-colors cursor-pointer" onClick={() => window.location.href = '/dashboard'}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+                              <rect width="3" height="9" x="7" y="7"></rect>
+                              <rect width="3" height="5" x="14" y="7"></rect>
+                            </svg>
+                            Dashboard
+                          </div>
+                          <div className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-primary/10 transition-colors cursor-pointer" onClick={() => window.location.href = '/history'}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            History
+                          </div>
                           <button
                             onClick={handleLogout}
                             className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-destructive/10 text-destructive transition-colors"
@@ -127,26 +123,26 @@ export default function Header() {
             ) : (
               <div className="flex items-center gap-6">
                 <nav className="flex items-center space-x-4 text-sm font-medium">
-                  <Link href="/scan-food">
-                    <a className={`transition-colors hover:text-primary ${location === "/scan-food" ? "text-primary" : ""}`}>
-                      Scan Food
-                    </a>
-                  </Link>
-                  <Link href="/meal-planning">
-                    <a className={`transition-colors hover:text-primary ${location === "/meal-planning" ? "text-primary" : ""}`}>
-                      Meal Plan
-                    </a>
-                  </Link>
-                  <Link href="/alternatives">
-                    <a className={`transition-colors hover:text-primary ${location === "/alternatives" ? "text-primary" : ""}`}>
-                      Alternatives
-                    </a>
-                  </Link>
-                  <Link href="/workout-plans">
-                    <a className={`transition-colors hover:text-primary ${location === "/workout-plans" ? "text-primary" : ""}`}>
-                      Workout
-                    </a>
-                  </Link>
+                  <span 
+                    onClick={() => window.location.href = '/scan-food'}
+                    className={`transition-colors hover:text-primary ${location === "/scan-food" ? "text-primary" : ""} cursor-pointer`}>
+                    Scan Food
+                  </span>
+                  <span 
+                    onClick={() => window.location.href = '/meal-planning'}
+                    className={`transition-colors hover:text-primary ${location === "/meal-planning" ? "text-primary" : ""} cursor-pointer`}>
+                    Meal Plan
+                  </span>
+                  <span 
+                    onClick={() => window.location.href = '/alternatives'}
+                    className={`transition-colors hover:text-primary ${location === "/alternatives" ? "text-primary" : ""} cursor-pointer`}>
+                    Alternatives
+                  </span>
+                  <span 
+                    onClick={() => window.location.href = '/workout-plans'}
+                    className={`transition-colors hover:text-primary ${location === "/workout-plans" ? "text-primary" : ""} cursor-pointer`}>
+                    Workout
+                  </span>
                 </nav>
                 <div className="flex items-center gap-3">
                   <Link href="/auth">

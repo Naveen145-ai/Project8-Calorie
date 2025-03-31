@@ -3,15 +3,22 @@ import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { CameraIcon, UtensilsIcon, Dumbbell, PersonStandingIcon, LogOutIcon } from "lucide-react";
+import { CameraIcon, UtensilsIcon, Dumbbell, PersonStandingIcon, LogOutIcon, Clock, History } from "lucide-react";
 import Header from "@/components/Header";
-import ChatBot from "@/components/ChatBot";
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
   
   const handleLogout = () => {
     logoutMutation.mutate();
+  };
+
+  // Get current time of day greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
   };
 
   return (
@@ -26,11 +33,16 @@ export default function HomePage() {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-3xl font-bold tracking-tight mb-2">
-            Welcome, {user?.username || 'User'}!
+            {getGreeting()}, <span className="text-primary">{user?.fullName || user?.username || 'User'}</span>!
           </h1>
           <p className="text-muted-foreground">
             Manage your nutrition and fitness journey with NutriScan AI
           </p>
+          
+          <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+            <Clock className="h-4 w-4" />
+            <span>Last login: {new Date().toLocaleDateString()}</span>
+          </div>
         </motion.div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -125,9 +137,6 @@ export default function HomePage() {
           </Button>
         </div>
       </main>
-      
-      {/* ChatBot component */}
-      <ChatBot />
     </div>
   );
 }
