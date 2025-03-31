@@ -106,10 +106,54 @@ export default function MobileNav() {
                   </Link>
                 </SheetClose>
                 <SheetClose asChild>
+                  <Link href="/scan-food">
+                    <Button
+                      variant={location === "/scan-food" ? "default" : "ghost"}
+                      className="justify-start w-full text-left"
+                    >
+                      <Camera className="w-5 h-5 mr-2" />
+                      Scan Food
+                    </Button>
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link href="/meal-planning">
+                    <Button
+                      variant={location === "/meal-planning" ? "default" : "ghost"}
+                      className="justify-start w-full text-left"
+                    >
+                      <UtensilsCrossed className="w-5 h-5 mr-2" />
+                      Meal Plan
+                    </Button>
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link href="/alternatives">
+                    <Button
+                      variant={location === "/alternatives" ? "default" : "ghost"}
+                      className="justify-start w-full text-left"
+                    >
+                      <Salad className="w-5 h-5 mr-2" />
+                      Alternatives
+                    </Button>
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link href="/workout-plans">
+                    <Button
+                      variant={location === "/workout-plans" ? "default" : "ghost"}
+                      className="justify-start w-full text-left"
+                    >
+                      <Dumbbell className="w-5 h-5 mr-2" />
+                      Workout
+                    </Button>
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
                   <Link href="/auth">
                     <Button
                       variant="default"
-                      className="w-full"
+                      className="w-full mt-4"
                     >
                       Sign In / Register
                     </Button>

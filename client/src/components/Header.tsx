@@ -89,13 +89,37 @@ export default function Header() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-4">
-                <Link href="/auth">
-                  <Button variant="outline">Sign In</Button>
-                </Link>
-                <Link href="/auth?tab=register">
-                  <Button>Sign Up</Button>
-                </Link>
+              <div className="flex items-center gap-6">
+                <nav className="flex items-center space-x-4 text-sm font-medium">
+                  <Link href="/scan-food">
+                    <a className={`transition-colors hover:text-primary ${location === "/scan-food" ? "text-primary" : ""}`}>
+                      Scan Food
+                    </a>
+                  </Link>
+                  <Link href="/meal-planning">
+                    <a className={`transition-colors hover:text-primary ${location === "/meal-planning" ? "text-primary" : ""}`}>
+                      Meal Plan
+                    </a>
+                  </Link>
+                  <Link href="/alternatives">
+                    <a className={`transition-colors hover:text-primary ${location === "/alternatives" ? "text-primary" : ""}`}>
+                      Alternatives
+                    </a>
+                  </Link>
+                  <Link href="/workout-plans">
+                    <a className={`transition-colors hover:text-primary ${location === "/workout-plans" ? "text-primary" : ""}`}>
+                      Workout
+                    </a>
+                  </Link>
+                </nav>
+                <div className="flex items-center gap-3">
+                  <Link href="/auth">
+                    <Button variant="outline">Sign In</Button>
+                  </Link>
+                  <Link href="/auth?tab=register">
+                    <Button>Sign Up</Button>
+                  </Link>
+                </div>
               </div>
             )}
           </>

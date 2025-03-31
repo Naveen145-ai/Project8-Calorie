@@ -24,15 +24,26 @@ export default function LandingHeader() {
         ) : (
           <div className="flex items-center gap-4">
             <nav className="flex items-center space-x-6 mr-4 text-sm font-medium">
-              <span className="cursor-pointer transition-colors hover:text-primary" onClick={() => window.location.hash = "#features"}>
-                Features
-              </span>
-              <span className="cursor-pointer transition-colors hover:text-primary" onClick={() => window.location.hash = "#how-it-works"}>
-                How It Works
-              </span>
-              <span className="cursor-pointer transition-colors hover:text-primary" onClick={() => window.location.hash = "#faq"}>
-                FAQ
-              </span>
+              <Link href="/scan-food">
+                <span className="cursor-pointer transition-colors hover:text-primary">
+                  Scan Food
+                </span>
+              </Link>
+              <Link href="/meal-planning">
+                <span className="cursor-pointer transition-colors hover:text-primary">
+                  Meal Plan
+                </span>
+              </Link>
+              <Link href="/alternatives">
+                <span className="cursor-pointer transition-colors hover:text-primary">
+                  Alternatives
+                </span>
+              </Link>
+              <Link href="/workout-plans">
+                <span className="cursor-pointer transition-colors hover:text-primary">
+                  Workout
+                </span>
+              </Link>
             </nav>
             <Link href="/auth">
               <Button variant="outline">Sign In</Button>
